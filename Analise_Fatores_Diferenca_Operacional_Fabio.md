@@ -35,7 +35,7 @@ Os resultados obtidos permitem direcionar esforços investigativos para as vari�
 A metodologia foi estruturada para identificar, de forma robusta, quais variáveis operacionais apresentam maior associação com a Diferença Operacional (Dif_Ope). Para aumentar a confiabilidade dos resultados, a análise combina métodos estatísticos clássicos, modelos de regressão regularizada e algoritmos de aprendizado de máquina, avaliando os dados sob diferentes perspectivas matemáticas.
 A seguir são apresentadas a principais etapas do fluxo de análise: 
 
-2.1 Preparação dos Dados
+#### 2.1\. Preparação dos Dados
 
 A base de dados é construída a partir das informações diárias do balanço energético da unidade, contemplando: Vazões energéticas de entrada de gás natural por ponto de recebimento; Correntes energéticas de saída dos produtos; Consumo de gás combustível; Queima em flare; Composição cromatográfica do gás de entrada; Poder calorífico superior (PCS) dos produtos.
 Os dados são consolidados em uma única base diária, na qual cada linha representa um dia operacional e cada coluna representa uma variável potencialmente relacionada à Diferença Operacional.
