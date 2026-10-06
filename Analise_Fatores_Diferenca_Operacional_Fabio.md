@@ -42,20 +42,20 @@ Os dados são consolidados em uma única base diária, na qual cada linha repres
 A variável resposta é calculada conforme : Dif_Ope = Entradas − Saídas − Consumos − Queima.
 Em condições ideais, a Diferença Operacional deveria permanecer próxima de zero. Desvios positivos ou negativos indicam possíveis inconsistências de medição, problemas operacionais ou limitações inerentes ao processo.
 
-2.2 Avaliação Mensal
+#### 2.2\. Avaliação Mensal
 
 A primeira abordagem adotada consiste na realização de análises independentes para cada mês do período avaliado. Nessa estratégia, cada mês é tratado como uma amostra operacional independente, permitindo identificar quais variáveis apresentaram maior associação com a Diferença Operacional naquele intervalo específico.
 A análise mensal tem como principal objetivo identificar alterações estruturais nos fatores que influenciam o fechamento energético ao longo do tempo.
 Para cada mês são aplicados quatro métodos independentes (correlação, Regressão Ridge, Regressão Elastic Net e Randon Forest).
 
-2.2.1 Correlação
+##### 2.2.1\. Correlação
 
 A análise de correlação busca medir o grau de associação entre cada variável operacional e a Diferença Operacional. O modelo permite a utilização de diferentes coeficientes de correlação, de acordo com o objetivo da análise: Pearson (avalia relações lineares entre as variáveis, sendo mais indicado quando os dados apresentam comportamento aproximadamente linear e distribuição próxima da normalidade); Spearman (avalia relações monotônicas a partir do ordenamento dos dados, apresentando maior robustez frente a distribuições não normais, presença de outliers e relações não estritamente lineares) e Kendall (mede a concordância entre os rankings das observações, sendo particularmente útil em conjuntos de dados com amostras reduzidas ou elevada presença de empates).
 Neste trabalho, foi adotado o coeficiente de Spearman, devido à sua maior robustez para dados operacionais, que frequentemente apresentam distribuições assimétricas, valores extremos e comportamentos não lineares.
 Para cada mês: Calcula-se a correlação entre cada variável explicativa e a Diferença Operacional; As variáveis são classificadas pelo valor absoluto da correlação; São selecionadas as variáveis com maior magnitude de associação.
 A interpretação dos resultados é direta, uma correlação positiva indica que o aumento da variável tende a aumentar a Diferença Operacional. Por outro lado, uma correlação negativa indica que o aumento da variável tende a reduzir a Diferença Operacional e a correlação próxima de zero indica baixa associação estatística.
 
-2.2.2 Regressão Ridge
+##### 2.2.2\. Regressão Ridge
 
 A Regressão Ridge é empregada para tratar a multicolinearidade, no problema em questão diversas variáveis do balanço energético possuem forte correlação entre si. Nessa situação, regressões convencionais podem gerar coeficientes instáveis e difíceis de interpretar.
 A regressão Ridge adiciona um termo de penalização aos coeficientes do modelo, reduzindo a variância das estimativas e tornando os resultados mais robustos.
@@ -63,7 +63,7 @@ Para cada mês: As variáveis são normalizadas utilizando StandardScaler; O fat
 O sinal do coeficiente indica a direção do efeito da variável sobre a Diferença Operacional de forma similar ao conceito empregado na análise por correlação. 
 Adicionalmente são calculadas métricas de desempenho do modelo para avaliar o quanto as variáveis operacionais explicam a variabilidade observada no balanço energético.
 
-2.2.3 Elastic Net
+##### 2.2.3\. Elastic Net
 
 O Elastic Net combina as vantagens das regressões Ridge e Lasso. Além de reduzir os efeitos da multicolinearidade, o método realiza seleção automática de variáveis, eliminando fatores com baixa contribuição explicativa.
 A modelagem ocorre em três etapas: Remoção de variáveis altamente redundantes; Normalização das variáveis através de RobustScaler; Ajuste do modelo Elastic Net utilizando validação cruzada.
@@ -71,13 +71,13 @@ Os parâmetros de regularização são obtidos automaticamente: Alfa (intensidad
 A principal vantagem dessa abordagem é produzir modelos mais compactos e interpretáveis, destacando apenas as variáveis com maior relevância estatística.
 O desempenho é avaliado através do coeficiente de determinação obtido para cada mês.
 
-2.2.4 Random Forest
+##### 2.2.4\. Random Forest
 
 O algoritmo Random Forest é utilizado para capturar relacionamentos não lineares que normalmente não são identificados pelos modelos de regressão tradicionais. O método é baseado na construção de múltiplas árvores de decisão e apresenta elevada capacidade de modelar interações complexas entre variáveis.
 A modelagem ocorre em dois estágios: Etapa 1 – Seleção preliminar (Construção de uma floresta inicial e Seleção das variáveis mais relevantes) e Etapa 2 – Modelo final (Construção de uma nova floresta apenas com as variáveis selecionadas e importância das variáveis é calculada utilizando a técnica de Permutation Importance).
 Na técnica de Permutation Importance, o modelo é treinado normalmente e uma variável é embaralhada aleatoriamente e o desempenho do modelo é avaliado, quanto maior a perda observada, maior a importância da variável. Como essa técnica não possui sinal, este é estimado a partir da correlação da variável com a Diferença Operacional.
 
-2.2.5 Consenso entre Métodos
+##### 2.2.5\. Consenso entre Métodos
 
 Cada método possui vantagens e limitações específicas e por essa razão, os resultados não são avaliados isoladamente.
 Após a execução dos quatro modelos é calculado um índice de consenso que quantifica quantas vezes uma mesma variável aparece entre os principais direcionadores identificados pelos diferentes métodos.
@@ -85,34 +85,34 @@ Uma variável é considerada consensual quando é selecionada simultaneamente po
 Essa estratégia reduz o risco de falsos positivos e aumenta a confiabilidade das conclusões.
 Além disso, é elaborado um ranking consolidado contendo: Frequência de ocorrência da variável; Sinal predominante; Score acumulado de consenso; Número de meses em que a variável foi identificada.
 
-2.3 Avaliação por Janela Móvel
+#### 2.3\. Avaliação por Janela Móvel
 
 Enquanto a análise mensal busca identificar tendências estruturais, a análise por janela móvel tem como objetivo identificar eventos operacionais transitórios e mudanças dinâmicas de comportamento.Nessa abordagem, uma janela temporal deslizante é aplicada sobre a série histórica.
 Para reduzir o ruído observado nos dados, foram utilizadas múltiplas janelas de observação, por exemplo, 15 dias e 120 dias. Cada dia da série passa a possuir uma análise própria, construída com base nos dados ao seu redor.
 Para minimizar distorções próximas às extremidades da série, foi utilizada a técnica de espelhamento dos dados nas bordas.
 Para cada janela são aplicados três métodos independentes (correlação, Regressão Ridge e Randon Forest).
 
-2.3.1 Correlação em Janela Móvel
+##### 2.3.1\. Correlação em Janela Móvel
 
 Para cada dia: Seleciona-se a janela de análise; Calcula-se a correlação entre todas as variáveis e a Diferença Operacional; São identificadas as variáveis com maior magnitude de correlação.
 O procedimento é repetido para toda a série histórica e o resultado é um mapa temporal que evidencia quando determinadas variáveis passaram a apresentar maior associação com os desvios do balanço.
 
-2.3.2 Regressão Ridge em Janela Móvel
+##### 2.3.2\. Regressão Ridge em Janela Móvel
 
 O mesmo conceito é aplicado à regressão Ridge, para cada dia: É criada uma janela temporal centrada na data de interesse; As variáveis são normalizadas; O modelo Ridge é ajustado; São armazenados os coeficientes obtidos. A evolução temporal dos coeficientes permite identificar mudanças graduais no comportamento da planta.
 
-2.3.3 Random Forest em Janela Móvel
+##### 2.3.3\. Random Forest em Janela Móvel
 
 A mesma metodologia é utilizada com o algoritmo Random Forest, para cada janela: É realizado um processo de seleção de variáveis; O modelo Random Forest é ajustado; É calculada a importância por permutação; É atribuído um sinal à importância obtida.
 Os resultados permitem identificar eventos que possuam comportamento não linear e que poderiam não ser detectados pelos métodos estatísticos tradicionais.
 
-2.3.4 Consenso Diário e Consolidação Mensal
+##### 2.3.4\. Consenso Diário e Consolidação Mensal
 
 Após a execução dos três métodos em todas as janelas temporais, é realizado um processo de consenso em duas etapas: Etapa 1 – Consenso entre janelas (Uma variável recebe maior relevância quando aparece simultaneamente em diferentes tamanhos de janela e mantendo o mesmo sinal) e Etapa 2 – Consenso entre métodos (São comparados os resultados da: Correlação, Regressão Ridge e Random Forest)
 As variáveis identificadas simultaneamente pelos métodos recebem maior pontuação e são classificadas como os principais direcionadores do dia.
 Posteriormente, os resultados diários são consolidados mensalmente, permitindo identificar quais variáveis aparecem de forma recorrente durante cada período operacional.
 
-2.4 Clusterização dos Resultados
+#### 2.4\. Clusterização dos Resultados
 
 Como etapa complementar, os resultados gerados pelos diferentes métodos são utilizados como entrada para algoritmos de clusterização. O objetivo é agrupar períodos que apresentem padrões semelhantes de direcionadores da Diferença Operacional. Antes da clusterização, é aplicada Análise de Componentes Principais (PCA), responsável por reduzir a dimensionalidade do problema preservando aproximadamente 90% da variabilidade dos dados.
 O modelo permite a utilização de diferentes algoritmos de aprendizado não supervisionado, possibilitando a comparação de abordagens distintas para identificação dos agrupamentos: K-Means (particiona os dados em grupos definidos previamente, buscando maximizar a similaridade interna dos elementos de cada cluster); Agglomerative Clustering (método hierárquico que constrói os agrupamentos de forma progressiva a partir da proximidade entre as observações); Gaussian Mixture Model (abordagem probabilística que estima a probabilidade de cada observação pertencer a cada grupo identificado); Spectral Clustering (técnica baseada em grafos capaz de identificar agrupamentos com fronteiras complexas e não lineares); HDBSCAN (método baseado em densidade que identifica agrupamentos de tamanhos variados e permite classificar observações atípicas como ruído); DBSCAN (algoritmo de agrupamento por densidade adequado para identificação de padrões não lineares e detecção de anomalias).
